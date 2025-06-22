@@ -24,8 +24,8 @@ if model.config.use_llm_lora:
     model.language_model = model.language_model.model
     model.config.use_llm_lora = 0
 
-print('Saving model...')
+print(f'Saving model to {args.output_path}...')
 model.save_pretrained(args.output_path)
-print('Saving tokenizer...')
+print(f'Saving tokenizer to {args.output_path}...')
 tokenizer.save_pretrained(args.output_path)
 print('Done!')
