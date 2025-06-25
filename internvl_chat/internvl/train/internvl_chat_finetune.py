@@ -402,6 +402,14 @@ class LazySupervisedDataset(Dataset):
         # Load the image using tcs_loader if available, otherwise use PIL
         if self.tcs_loader is not None and 's3://' in image_path:
             return self.tcs_loader(image_path)
+        
+        
+        # Not sure why, needed to do every time. Cannot import at the top
+        from pillow_avif.AvifImagePlugin import AvifImageFile, _accept
+        from PIL import Image
+        Image.register_open(AvifImageFile.format, AvifImageFile, _accept)
+        Image.register_extension(AvifImageFile.format, ".avif")
+
         return Image.open(image_path).convert('RGB')
 
     def get_image_path(self, image_path):
@@ -658,7 +666,7 @@ class LazySupervisedDataset(Dataset):
                 break
             except Exception as e:
                 try_cnt += 1
-                print(e, self.ds_name, flush=True)
+                print("received an exception", e, self.ds_name, flush=True)
                 if not isinstance(e, (UnidentifiedImageError, FileNotFoundError)):
                     traceback.print_exc()
                 data_item = json.loads(self.raw_data[i])
