@@ -341,7 +341,7 @@ class InternVLChatModel(PreTrainedModel):
 
     def chat(self, tokenizer, pixel_values, question, generation_config, history=None, return_history=False,
              num_patches_list=None, IMG_START_TOKEN='<img>', IMG_END_TOKEN='</img>', IMG_CONTEXT_TOKEN='<IMG_CONTEXT>',
-             verbose=False):
+             verbose=False, system_message=None):
 
         if history is None and pixel_values is not None and '<image>' not in question:
             question = '<image>\n' + question
@@ -354,7 +354,11 @@ class InternVLChatModel(PreTrainedModel):
         self.img_context_token_id = img_context_token_id
 
         template = get_conv_template(self.template)
-        template.system_message = self.system_message
+        if system_message is not None:
+            template.system_message = system_message
+        else:
+            template.system_message = self.system_message
+            
         eos_token_id = tokenizer.convert_tokens_to_ids(template.sep.strip())
 
         history = [] if history is None else history
