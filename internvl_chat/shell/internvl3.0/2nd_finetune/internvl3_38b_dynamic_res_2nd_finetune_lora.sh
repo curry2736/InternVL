@@ -14,7 +14,7 @@ export LAUNCHER=pytorch
 # Generate a timestamp e.g., 2023-10-27_15-30-00
 TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
 
-MODEL_TYPE_DIR='work_dirs/internvl_chat_v3/internvl3_1b_dynamic_res_2nd_finetune_full'
+MODEL_TYPE_DIR='work_dirs/internvl_chat_v3/internvl3_38B_dynamic_res_2nd_finetune_lora'
 OUTPUT_DIR="${MODEL_TYPE_DIR}/${TIMESTAMP}"
 
 if [ ! -d "$OUTPUT_DIR" ]; then
