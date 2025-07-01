@@ -388,11 +388,11 @@ class InternVLChatModel(PreTrainedModel):
             attention_mask=attention_mask,
             **generation_config
         )
-        response = tokenizer.batch_decode(generation_output, skip_special_tokens=True)[0]
+        response = tokenizer.batch_decode(generation_output.sequences, skip_special_tokens=True)[0]
         response = response.split(template.sep.strip())[0].strip()
         history.append((question, response))
         if return_history:
-            return response, history
+            return response, history, generation_output
         else:
             query_to_print = query.replace(IMG_CONTEXT_TOKEN, '')
             query_to_print = query_to_print.replace(f'{IMG_START_TOKEN}{IMG_END_TOKEN}', '<image>')
