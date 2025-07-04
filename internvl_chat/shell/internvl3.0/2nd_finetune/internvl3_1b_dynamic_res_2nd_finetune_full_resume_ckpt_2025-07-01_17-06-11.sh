@@ -29,7 +29,7 @@ fi
 
 LOG_FILE="${LOG_DIR}/training_log_${TIMESTAMP}.txt"
 
-ORIGINAL_MODEL_PATH="/home/jovyan/data/arisrei_ws/vlm_deep_scan/vlm_deep_scan/third_party_models/InternVL/pretrained/InternVL3-1B"
+ORIGINAL_MODEL_PATH="/home/jovyan/data/arisrei_ws/vlm_deep_scan/vlm_deep_scan/third_party_models/InternVL/internvl_chat/work_dirs/internvl_chat_v3/internvl3_1b_dynamic_res_2nd_finetune_full/2025-07-01_17-06-11"
 
 # number of gpus: 8
 # batch size per gpu: 4
@@ -59,7 +59,7 @@ torchrun \
   --vision_select_layer -1 \
   --dataloader_num_workers 4 \
   --bf16 True \
-  --num_train_epochs 50 \
+  --num_train_epochs 45 \
   --per_device_train_batch_size ${PER_DEVICE_BATCH_SIZE} \
   --per_device_eval_batch_size ${PER_DEVICE_BATCH_SIZE} \
   --gradient_accumulation_steps ${GRADIENT_ACC} \
@@ -83,6 +83,7 @@ torchrun \
   --ps_version 'v2' \
   --deepspeed "zero_stage1_config.json" \
   --report_to "tensorboard" \
+  --resume_from_checkpoint ${ORIGINAL_MODEL_PATH} \
   2>&1 | tee -a "${LOG_FILE}"
 
   python /home/jovyan/data/arisrei_ws/vlm_deep_scan/vlm_deep_scan/scripts/copy_py_files.py ${ORIGINAL_MODEL_PATH} ${OUTPUT_DIR}

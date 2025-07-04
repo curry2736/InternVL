@@ -31,6 +31,8 @@ TIMESTAMP=$(date +%Y-%m-%d_%H-%M-%S)
 
 LOG_FILE="${LOG_DIR}/training_log_${TIMESTAMP}.txt"
 
+ORIGINAL_MODEL_PATH="/home/jovyan/data/arisrei_ws/vlm_deep_scan/vlm_deep_scan/third_party_models/InternVL/pretrained/InternVL3-38B"
+
 # number of gpus: 8
 # batch size per gpu: 4
 # gradient accumulation steps: 4
@@ -43,7 +45,7 @@ torchrun \
   --nproc_per_node=${GPUS} \
   --master_port=${MASTER_PORT} \
   internvl/train/internvl_chat_finetune.py \
-  --model_name_or_path "/home/jovyan/data/arisrei_ws/vlm_deep_scan/vlm_deep_scan/third_party_models/InternVL/pretrained/InternVL3-38B" \
+  --model_name_or_path ${ORIGINAL_MODEL_PATH} \
   --conv_style "internvl2_5" \
   --use_fast_tokenizer False \
   --output_dir ${OUTPUT_DIR} \
@@ -60,12 +62,14 @@ torchrun \
   --vision_select_layer -1 \
   --dataloader_num_workers 4 \
   --bf16 True \
-  --num_train_epochs 1 \
+  --num_train_epochs 5 \
   --per_device_train_batch_size ${PER_DEVICE_BATCH_SIZE} \
+  --per_device_eval_batch_size ${PER_DEVICE_BATCH_SIZE} \
   --gradient_accumulation_steps ${GRADIENT_ACC} \
-  --evaluation_strategy "no" \
-  --save_strategy "steps" \
-  --save_steps 200 \
+  --evaluation_strategy "epoch" \
+  --do_eval True \
+  --load_best_model_at_end True \
+  --save_strategy "epoch" \
   --save_total_limit 2 \
   --learning_rate 2e-5 \
   --weight_decay 0.05 \
@@ -83,6 +87,6 @@ torchrun \
   --report_to "tensorboard" \
   2>&1 | tee -a "${LOG_FILE}"
 
-  python -m tools.merge_lora \
-  ${OUTPUT_DIR} \
-  /home/jovyan/data/arisrei_ws/vlm_deep_scan/vlm_deep_scan/third_party_models/InternVL/internvl_chat/work_dirs/internvl_chat_v3/internvl3_38B_dynamic_res_2nd_finetune_lora_merged
+  python -m tools.merge_lora ${OUTPUT_DIR} ${OUTPUT_DIR}/lora_merged
+
+  python /home/jovyan/data/arisrei_ws/vlm_deep_scan/vlm_deep_scan/scripts/copy_py_files.py ${ORIGINAL_MODEL_PATH} ${OUTPUT_DIR}/lora_merged
