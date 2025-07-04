@@ -1062,6 +1062,8 @@ def main():
             checkpoint = training_args.resume_from_checkpoint
         elif last_checkpoint is not None:
             checkpoint = last_checkpoint
+        if checkpoint is not None:
+            logger.info(f'Resuming from checkpoint: {checkpoint}')
         train_result = trainer.train(resume_from_checkpoint=checkpoint)
         trainer.save_model()  # Saves the tokenizer too for easy upload
 
